@@ -1060,22 +1060,491 @@ m.mount(
 
 
 
+// https://svelte.dev/tutorial/component-events
+
+
+/*
+
+// Inner.svelte
+
+<script>
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
+	function sayHello() {
+		dispatch('message', {
+			text: 'Hello!'
+		});
+	}
+</script>
+
+<button on:click={sayHello}>
+	Click to say hello
+</button>
+
+
+// App.svelte
+
+<script>
+	import Inner from './Inner.svelte';
+
+	function handleMessage(event) {
+		alert(event.detail.text);
+	}
+</script>
+
+<Inner on:message={handleMessage}/>
+
+*/
+
+
+// Inner.js
+const Inner = () => {
+
+  function sayHello(event) {
+		alert("Hello!")
+  }
+  
+  return {
+    view: v => m("button", {onclick:sayHello}, "Click to say hello")
+  }
+  
+}
+
+
+// App.js
+// import Inner from './Inner.js'
+// Can be done but in vannila js: https://javascript.info/dispatch-events
+
+m.mount(
+  document.getElementById("event-modifiers"),
+  Inner()
+)
+
+
+
+// https://svelte.dev/tutorial/event-forwarding
+
+
+/*
+
+// Outer.svelte
+
+<script>
+	import Inner from './Inner.svelte';
+</script>
+
+<Inner on:message/>
+
+
+
+// Inner.svelte
+
+<script>
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
+	function sayHello() {
+		dispatch('message', {
+			text: 'Hello!'
+		});
+	}
+</script>
+
+<button on:click={sayHello}>
+	Click to say hello
+</button>
+
+
+// App.svelte
+
+<script>
+	import Outer from './Outer.svelte';
+
+	function handleMessage(event) {
+		alert(event.detail.text);
+	}
+</script>
+
+<Outer on:message={handleMessage}/>
+
+*/
+
+
+// event-forwarding todo
+
+
+
+// https://svelte.dev/tutorial/dom-event-forwarding
+
+
+/*
+
+// CustomButton.svelte
+
+<style>
+	button {
+		height: 4rem;
+		width: 8rem;
+		background-color: #aaa;
+		border-color: #f1c40f;
+		color: #f1c40f;
+		font-size: 1.25rem;
+		background-image: linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+		background-position: 100%;
+		background-size: 400%;
+		transition: background 300ms ease-in-out;
+	}
+	button:hover {
+		background-position: 0;
+		color: #aaa;
+	}
+</style>
+
+<button on:click>
+	Click me
+</button>
+
+
+
+// App.svelte
+
+<script>
+	import CustomButton from './CustomButton.svelte';
+
+	function handleClick() {
+		alert('clicked');
+	}
+</script>
+
+<CustomButton on:click={handleClick}/>
+
+
+*/
+
+
+// dom-event-forwarding TODO
+
+
+
+// https://svelte.dev/tutorial/text-inputs
+
+/*
+
+<script>
+	let name = 'world';
+</script>
+
+<input bind:value={name}>
+
+<h1>Hello {name}!</h1>
+
+*/
+
+const Bindings = () => {
+
+  let name = 'world'
+
+  return {
+    view: v => [
+      m("h1", `Hello ${name}!`),
+      m("input", {oninput:event => {name=event.target.value}, value:name})
+    ]
+    
+  }
+}
+
+
+m.mount(
+  document.getElementById("text-inputs"),
+  Bindings()
+)
+
+
+// https://svelte.dev/tutorial/numeric-inputs
+
+/*
+
+<script>
+	let a = 1;
+	let b = 2;
+</script>
+
+<label>
+	<input type=number bind:value={a} min=0 max=10>
+	<input type=range bind:value={a} min=0 max=10>
+</label>
+
+<label>
+	<input type=number bind:value={b} min=0 max=10>
+	<input type=range bind:value={b} min=0 max=10>
+</label>
+
+<p>{a} + {b} = {a + b}</p>
+
+*/
+
+
+const NumericBindings = () => {
+  
+  let a = 1
+  let b = 2
+  
+  function bind_a(event){
+    a = Number(event.target.value)
+  }
+
+  function bind_b(event){
+    b = Number(event.target.value)
+  }
+
+  return {
+    view: v => [
+
+      m("label", [
+        m("input", {type:"number", value:a, min:0, max:10, oninput:bind_a}, a),
+        m("input", {type:"range", value:a, min:0, max:10, oninput:bind_a}, a)
+      ]),
+
+      m("label", [
+        m("input", {type:"number", value:b, min:0, max:10, oninput:bind_b}, b),
+        m("input", {type:"range", value:b, min:0, max:10, oninput:bind_b}, b)
+      ]),
+
+      m("p", `${a} + ${b} = ${a + b}`)
+
+    ]
+    
+  }
+}
+
+
+m.mount(
+  document.getElementById("numeric-inputs"),
+  NumericBindings()
+)
+
+
+// https://svelte.dev/tutorial/checkbox-inputs
+
+/*
+
+<script>
+	let yes = false;
+</script>
+
+<label>
+	<input type=checkbox bind:checked={yes}>
+	Yes! Send me regular email spam
+</label>
+
+{#if yes}
+	<p>Thank you. We will bombard your inbox and sell your personal details.</p>
+{:else}
+	<p>You must opt in to continue. If you're not paying, you're the product.</p>
+{/if}
+
+<button disabled={!yes}>
+	Subscribe
+</button>
+
+
+*/
+
+
+const Checkbox = () => {
+
+  let yes = false
+
+  return {
+    view: v => [
+
+      m("label", [
+        m("input", {type:"checkbox", onchange:() => yes = !yes }),
+        m("span", "Yes! Send me regular email spam")
+      ]),
+
+      yes   
+      ? m("p", "Thank you. We will bombard your inbox and sell your personal details.") 
+      : m("p", "You must opt in to continue. If you're not paying, you're the product."),
+
+      m("button", {disabled:!yes}, "Subscribe")
+    ]
+  }
+}
+
+
+
+m.mount(
+  document.getElementById("checkbox-inputs"),
+  Checkbox()
+)
 
 
 
 
+// https://svelte.dev/tutorial/group-inputs
+
+/*
+
+<script>
+	let scoops = 1;
+	let flavours = ['Mint choc chip'];
+
+	let menu = [
+		'Cookies and cream',
+		'Mint choc chip',
+		'Raspberry ripple'
+	];
+
+	function join(flavours) {
+		if (flavours.length === 1) return flavours[0];
+		return `${flavours.slice(0, -1).join(', ')} and ${flavours[flavours.length - 1]}`;
+	}
+</script>
+
+<h2>Size</h2>
+
+<label>
+	<input type=radio bind:group={scoops} value={1}>
+	One scoop
+</label>
+
+<label>
+	<input type=radio bind:group={scoops} value={2}>
+	Two scoops
+</label>
+
+<label>
+	<input type=radio bind:group={scoops} value={3}>
+	Three scoops
+</label>
+
+<h2>Flavours</h2>
+
+{#each menu as flavour}
+	<label>
+		<input type=checkbox bind:group={flavours} value={flavour}>
+		{flavour}
+	</label>
+{/each}
+
+{#if flavours.length === 0}
+	<p>Please select at least one flavour</p>
+{:else if flavours.length > scoops}
+	<p>Can't order more flavours than scoops!</p>
+{:else}
+	<p>
+		You ordered {scoops} {scoops === 1 ? 'scoop' : 'scoops'}
+		of {join(flavours)}
+	</p>
+{/if}
+
+
+*/
 
 
 
+let scoops = 1
+let flavours = ['Mint choc chip']
+
+let menu = [
+  'Cookies and cream',
+  'Mint choc chip',
+  'Raspberry ripple'
+]
+
+
+function join(flavours) {
+  if (flavours.length === 1) return flavours[0]
+  return `${flavours.slice(0, -1).join(', ')} and ${flavours[flavours.length - 1]}`
+}
+
+
+function bind_scoops(event){
+  scoops = event.target.value
+}
+
+function bind_flavour(event){
+  flavours.push(event.target.value)
+}
+
+
+const ScoopSize = {
+
+  view: ({attrs}) => [      
+    
+    m("h2", "Size"),
+
+    m("label", [
+      m("input", {type:"radio", value:1, name:"scoops", onchange:bind_scoops}),
+      m("span", "One scoop")
+    ]),
+      
+    m("label", [
+      m("input", {type:"radio", value:2, name:"scoops", onchange:bind_scoops}),
+      m("span", "Two scoops")
+    ]),
+      
+    m("label", [
+      m("input", {type:"radio", value:3, name:"scoops", onchange:bind_scoops}),
+      m("span", "Three scoops")
+    ]),
+  ]
+
+}
+
+
+const Flavours = {
+  view: ({ attrs }) => [
+    m("h2", "Flavours"),
+    menu.map(flavour => {
+      return m("label", [
+        m("input", {type:"checkbox", value:flavour, name:flavour, onchange:bind_flavour}),
+        m("span", flavour)
+      ])
+    })
+
+  ]
+}
+
+
+const Order = {
+  view: ({ attrs }) => {
+
+    if (flavours.length === 0){
+      return m("p", "Please select at least one flavour")
+    }
+    else if (flavours.length > scoops) {
+      return m("p", "Can't order more flavours than scoops!")
+    }
+    else {
+      return m("p", 
+      `You ordered ${scoops} ${scoops === 1 ? 'scoop' : 'scoops'} of ${join(flavours)}`)
+    }
+  }
+}
+
+
+const GroupedCk = () => {
+
+  return {
+    view: v => [
+      m(ScoopSize),
+      m(Flavours),
+      m(Order)
+    ]
+  }
+}
 
 
 
-
-
-
-
-
-
+m.mount(
+  document.getElementById("group-inputs"),
+  GroupedCk()
+)
 
 
 
