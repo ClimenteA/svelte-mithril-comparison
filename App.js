@@ -1592,6 +1592,169 @@ m.mount(
 
 
 
+// https://svelte.dev/tutorial/textarea-inputs
+
+
+/*
+
+<script>
+	import marked from 'marked';
+	let value = `Some words are *italic*, some are **bold**`;
+</script>
+
+<style>
+	textarea { width: 100%; height: 200px; }
+</style>
+
+<textarea bind:value></textarea>
+
+{@html marked(value)}
+
+*/
+
+
+// Here we would need this library 
+// https://github.com/markedjs/marked
+
+
+let value = `Some words are *italic*, some are **bold**`
+let textarea_style = { "width": "100%", "height": "200px"}
+
+
+const TextareaInputs = () => {
+  
+  function bind_text(event) {
+    value = event.target.value
+  }
+
+  return {
+    view: v => [
+      m("textarea", {style: textarea_style, oninput:bind_text}, value),
+      m("div", m.trust(marked(value)))
+    ]
+  }
+}
+
+
+m.mount(
+  document.getElementById("textarea-inputs"),
+  TextareaInputs()
+)
+
+
+// https://svelte.dev/tutorial/select-bindings
+
+/*
+
+<script>
+	let questions = [
+		{ id: 1, text: `Where did you go to school?` },
+		{ id: 2, text: `What is your mother's name?` },
+		{ id: 3, text: `What is another personal fact that an attacker could easily find with Google?` }
+	];
+
+	let selected;
+
+	let answer = '';
+
+	function handleSubmit() {
+		alert(`answered question ${selected.id} (${selected.text}) with "${answer}"`);
+	}
+</script>
+
+<style>
+	input { display: block; width: 500px; max-width: 100%; }
+</style>
+
+<h2>Insecurity questions</h2>
+
+<form on:submit|preventDefault={handleSubmit}>
+	<select bind:value={selected} on:change="{() => answer = ''}">
+		{#each questions as question}
+			<option value={question}>
+				{question.text}
+			</option>
+		{/each}
+	</select>
+
+	<input bind:value={answer}>
+
+	<button disabled={!answer} type=submit>
+		Submit
+	</button>
+</form>
+
+<p>selected question {selected ? selected.id : '[waiting...]'}</p>
+
+
+*/
+
+
+let questions = [
+  { id: 1, text: `Where did you go to school?` },
+  { id: 2, text: `What is your mother's name?` },
+  { id: 3, text: `What is another personal fact that an attacker could easily find with Google?` }
+]
+
+let selected
+let answer = ''
+
+function handleSubmit(event) {
+  event.preventDefault()
+  alert(`Answered question ${selected.id} (${selected.text}) with "${answer}"`)
+}
+
+
+const QuestionsForm = () => {
+
+  let input_style = { "display": "block", "width": "500px", "max-width": "100%" }
+
+  selected = questions[0]
+
+  function update_select(event){
+    answer = ''
+
+    selected = questions.filter(obj => {
+      if (event.target.value === obj.text){
+        return obj
+      }
+    })[0]
+
+  }
+
+  return {
+    view: v => [
+      m("h2", "Insecurity questions"),
+      m("form", {onsubmit:handleSubmit, style:input_style}, [
+        
+        m("select", { onchange:update_select },
+
+        questions.map(question => {
+          return m("option", {value:question.text}, question.text) 
+        }
+
+        )),
+  
+        m("input", {value:answer, oninput: event => answer = event.target.value}),
+        m("button", {type:"submit", disabled:!answer}, "Submit")   
+  
+      ])
+    ]
+  }
+}
+
+const QuestionResult = {
+  view: v => m("p", `Selected question ${selected ? selected.id : '[waiting...]'}`)
+}
+
+
+m.mount(
+  document.getElementById("select-bindings"),
+  {view: v => [
+    m(QuestionsForm),
+    m(QuestionResult)
+  ]}
+)
 
 
 
