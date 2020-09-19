@@ -1457,21 +1457,6 @@ let menu = [
 ]
 
 
-function join(flavours) {
-  if (flavours.length === 1) return flavours[0]
-  return `${flavours.slice(0, -1).join(', ')} and ${flavours[flavours.length - 1]}`
-}
-
-
-function bind_scoops(event){
-  scoops = event.target.value
-}
-
-function bind_flavour(event){
-  flavours.push(event.target.value)
-}
-
-
 const ScoopSize = {
 
   view: ({attrs}) => [      
@@ -1479,17 +1464,43 @@ const ScoopSize = {
     m("h2", "Size"),
 
     m("label", [
-      m("input", {type:"radio", value:1, name:"scoops", onchange:bind_scoops}),
+      m("input", 
+      { 
+        type:"radio", 
+        value:1, 
+        name:"scoops", 
+        checked: true ? scoops === 1 : false, 
+        onchange:() => scoops = 1
+      }),
+
       m("span", "One scoop")
+
     ]),
       
     m("label", [
-      m("input", {type:"radio", value:2, name:"scoops", onchange:bind_scoops}),
+      m("input", 
+      {
+        type:"radio", 
+        value:2, 
+        name:"scoops", 
+        checked: true ? scoops === 2 : false, 
+        onchange:() => scoops = 2
+      }),
+
       m("span", "Two scoops")
+
     ]),
       
     m("label", [
-      m("input", {type:"radio", value:3, name:"scoops", onchange:bind_scoops}),
+      m("input", 
+      {
+        type:"radio", 
+        value:3, 
+        name:"scoops", 
+        checked: true ? scoops === 3 : false, 
+        onchange:() => scoops = 3
+      }),
+
       m("span", "Three scoops")
     ]),
   ]
@@ -1497,12 +1508,45 @@ const ScoopSize = {
 }
 
 
+function join(flavours) {
+  if (flavours.length === 1) return flavours[0]
+  return `${flavours.slice(0, -1).join(', ')} and ${flavours[flavours.length - 1]}`
+}
+
+
+function bind_flavour(event){
+
+  if (!flavours.includes(event.target.value)) {
+    if(event.target.checked){
+      flavours.push(event.target.value)
+    }
+  }
+
+  else {
+    flavours = flavours.filter(flavour => {
+      if (flavour !== event.target.value){
+        return flavour
+      } 
+    })
+  }
+}
+
+
 const Flavours = {
-  view: ({ attrs }) => [
+
+  view:({ attrs }) => [
     m("h2", "Flavours"),
     menu.map(flavour => {
       return m("label", [
-        m("input", {type:"checkbox", value:flavour, name:flavour, onchange:bind_flavour}),
+        m("input", 
+        {
+          type:"checkbox", 
+          value:flavour, 
+          name:flavour, 
+          checked: true ? flavours.includes(flavour) : false,
+          onchange:bind_flavour
+        }),
+        
         m("span", flavour)
       ])
     })
@@ -1538,7 +1582,6 @@ const GroupedCk = () => {
     ]
   }
 }
-
 
 
 m.mount(
