@@ -1,6 +1,7 @@
 # Svelte vs Mithril
 
-A comparison between Svelte and Mithril
+A comparison between Svelte and Mithril.
+
 Svelte is cool and clean, but still needs node.
 
 
