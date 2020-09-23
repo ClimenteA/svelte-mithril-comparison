@@ -1757,20 +1757,211 @@ m.mount(
 )
 
 
+// https://svelte.dev/tutorial/multiple-select-bindings
+
+
+/*
+
+<script>
+
+	let scoops = 1;
+	let flavours = ['Mint choc chip'];
+
+	let menu = [
+		'Cookies and cream',
+		'Mint choc chip',
+		'Raspberry ripple'
+	];
+
+	function join(flavours) {
+		if (flavours.length === 1) return flavours[0];
+		return `${flavours.slice(0, -1).join(', ')} and ${flavours[flavours.length - 1]}`;
+	}
+</script>
+
+<h2>Size</h2>
+
+<label>
+	<input type=radio bind:group={scoops} value={1}>
+	One scoop
+</label>
+
+<label>
+	<input type=radio bind:group={scoops} value={2}>
+	Two scoops
+</label>
+
+<label>
+	<input type=radio bind:group={scoops} value={3}>
+	Three scoops
+</label>
+
+<h2>Flavours</h2>
+
+<select multiple bind:value={flavours}>
+	{#each menu as flavour}
+		<option value={flavour}>
+			{flavour}
+		</option>
+	{/each}
+</select>
+
+{#if flavours.length === 0}
+	<p>Please select at least one flavour</p>
+{:else if flavours.length > scoops}
+	<p>Can't order more flavours than scoops!</p>
+{:else}
+	<p>
+		You ordered {scoops} {scoops === 1 ? 'scoop' : 'scoops'}
+		of {join(flavours)}
+	</p>
+{/if}
+
+*/
+
+
+let model = {
+  scoops: 1,
+  flavours: ['Mint choc chip'],
+  menu: [
+    'Cookies and cream',
+    'Mint choc chip',
+    'Raspberry ripple'
+  ]  
+}
+
+
+let actions = {
+
+  join: function(flavours) {
+    if (model.flavours.length === 1) return model.flavours[0]
+    return `${model.flavours.slice(0, -1).join(', ')} and ${model.flavours[model.flavours.length - 1]}`
+  },
+  
+  bind_flavour: function(event){
+  
+    console.log(event.target.value)
+
+    // if (!model.flavours.includes(event.target.value)) {
+    //   if(event.target.checked){
+    //     model.flavours.push(event.target.value)
+    //   }
+    // }
+  
+    // else {
+    //   model.flavours = model.flavours.filter(flavour => {
+    //     if (flavour !== event.target.value){
+    //       return flavour
+    //     } 
+    //   })
+    // }
+
+
+  }
+
+}
+
+
+// TODO - not finished
+
+const SizeScoop = {
+
+  view: () => [      
+    
+    m("h2", "Size"),
+
+    m("label", [
+      m("input", 
+      { 
+        type:"radio", 
+        value:1, 
+        name:"scoops", 
+        checked: true ? model.scoops === 1 : false, 
+        onchange:() => model.scoops = 1
+      }),
+
+      m("span", "One scoop")
+
+    ]),
+      
+    m("label", [
+      m("input", 
+      {
+        type:"radio", 
+        value:2, 
+        name:"scoops", 
+        checked: true ? model.scoops === 2 : false, 
+        onchange:() => model.scoops = 2
+      }),
+
+      m("span", "Two scoops")
+
+    ]),
+      
+    m("label", [
+      m("input", 
+      {
+        type:"radio", 
+        value:3, 
+        name:"scoops", 
+        checked: true ? model.scoops === 3 : false, 
+        onchange:() => model.scoops = 3
+      }),
+
+      m("span", "Three scoops")
+    ]),
+  ]
+
+}
+
+
+const FlavoursMultiple = {
+
+  view:({ attrs }) => [
+    m("h2", "Flavours"),
+
+    m("select", {multiple:"multiple", onchange:actions.bind_flavour},
+      model.menu.map(flavour => {
+        return m("option", 
+        {
+          value:flavour,
+          selected: true ? model.flavours.includes(flavour) : false
+        }, flavour)
+      })
+    )
+  ]
+}
 
 
 
+const OrderComponent = {
+
+  view: () => {
+
+    if (model.flavours.length === 0){
+      return m("p", "Please select at least one flavour")
+    }
+    else if (model.flavours.length > model.scoops) {
+      return m("p", "Can't order more flavours than scoops!")
+    }
+    else {
+      return m("p", 
+      `You ordered ${model.scoops} ${model.scoops === 1 ? 'scoop' : 'scoops'} of ${actions.join(model.flavours)}`)
+    }
+  }
+}
 
 
-
-
-
-
-
-
-
-
-
+m.mount(
+  document.getElementById("multiple-select-bindings"),
+  {
+    view: v => [
+      m(SizeScoop),
+      m(FlavoursMultiple),
+      m(OrderComponent)
+    ]
+  }
+)
 
 
 
