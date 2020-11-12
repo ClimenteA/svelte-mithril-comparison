@@ -7,10 +7,10 @@ Out of all frameworks Svelte allows you to write code faster, easier and with ma
 Both Svelte and Mithril allows you to get up to speed in minutes.
 Indeed Svelte code looks more clean than Mithril, Vue, React code.
 
+
 But, 
 - if you hate configuring webpack and other package bundlers,
-- if you are using other language for the backend (ex: python/flask, golang/echo),
-- then Mithril or Hyperapp may be a better fit.
+- then Mithril or Hyperapp may be a better fit, browser now supports imports :).
 
 
 ```javascript
